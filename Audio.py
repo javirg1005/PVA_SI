@@ -1,5 +1,6 @@
 import moviepy.editor as mp
 import speech_recognition as sr
+import os
 
 
 #Conversion de Video a audio
@@ -18,8 +19,17 @@ with speech_audio as fuente:
 #Transcripcion
 texto_transcrito = recibido_cambio.recognize_google(audio, language = "es-ES")
 print(texto_transcrito)
-#Reconocimiento
 
+# Guarda la transcripción en un archivo en la ruta actual
+nombre_archivo_transcrito = os.path.splitext(respuesta)[0] + ".txt"
+archivo_transcrito = open (nombre_archivo_transcrito,"w+")
+archivo_transcrito.writelines(texto_transcrito)
+archivo_transcrito.close()
+
+print ("Se ha guardado la transcripción en el archivo " + nombre_archivo_transcrito + " en tu ruta actual")
+
+#Reconocimiento
+    
 #Edicion
 
 #Modificar e insertar
