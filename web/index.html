@@ -1,0 +1,39 @@
+<head>
+    <script src="eel.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        //Funciones de javascript que llaman a python
+        //eel.funcion()
+
+        function main() {
+            console.log($('#video_path').val());
+            document.querySelector("#video_car > source").src = $('#video_path').val();
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dataForm">
+        <h5>Introduzca la ruta del video:</h5>
+        <br>
+        <input id='video_path' class="ruta" type="text"> <!-- Input de ruta-->
+        <button class="ejecutar" onclick="getFilePath()">Ejecutar</button>
+    </div>
+    <div class="contenido">
+        <div class="video_div">
+            <video id="video_car" width="320" height="240" controls>
+                <source src="D:\Github\PVA_SI\PruebasSplit\PVA_SI_Video.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="transcripcion">
+            <!--JS editable chill-->
+            <textarea id="transcripcion" name="transcripcion"> 
+
+            </textarea>
+
+            <button class="boton-generico">Guardar</button>
+            <button class="boton-generico">Sugerir</button>
+
+        </div>
+    </div>
+</body>
