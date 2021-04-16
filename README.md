@@ -10,3 +10,4 @@ Por: Carlos Delgado Rodríguez y Javier Rodríguez González
 -ez_setup
 -MoviePy
 -SpeechRecognition
+-TKinter (tk)

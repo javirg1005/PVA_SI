@@ -1,14 +1,34 @@
 <head>
     <script src="eel.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script async src="//jsfiddle.net/dsbonev/cCCZ2/embed/"></script>
     <script>
         //Funciones de javascript que llaman a python
         //eel.funcion()
 
+        function abrir() {
+            eel.abrir_archivo();
+        }
+
+        eel.expose(cargarTexto);
+        function cargarTexto() {
+            texto = eel.leerTextoBruto()
+            document.getElementById("transcripcion").innerText = texto
+        }
+
+        eel.expose(showAnswers);
+        function showAnswers(answer) {
+            var outputDiv = document.getElementById("path_magic");
+            outputDiv.innerHTML = answer;
+            $('#video_car source').attr('src', "file://" + answer);
+        }
+
+        /*
         function main() {
             console.log($('#video_path').val());
             document.querySelector("#video_car > source").src = $('#video_path').val();
         }
+        */
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -16,24 +36,55 @@
     <div class="dataForm">
         <h5>Introduzca la ruta del video:</h5>
         <br>
-        <input id='video_path' class="ruta" type="text"> <!-- Input de ruta-->
-        <button class="ejecutar" onclick="getFilePath()">Ejecutar</button>
+        <div id='path_magic'></div>
     </div>
     <div class="contenido">
         <div class="video_div">
-            <video id="video_car" width="320" height="240" controls>
-                <source src="D:\Github\PVA_SI\PruebasSplit\PVA_SI_Video.mp4" type="video/mp4">
-            </video>
+            <div id="message"></div>
+            <input id='video_path' class="ruta" type="file" accept="video/*"> <!-- Input de ruta -->
+            <video id="video_car" width="852" height="480" controls></video>
+            <script type="text/javascript">
+                (function localFileVideoPlayer() {
+                    'use strict'
+                    var URL = window.URL || window.webkitURL
+                    var displayMessage = function (message, isError) {
+                        var element = document.querySelector('#message')
+                        element.innerHTML = message
+                        element.className = isError ? 'error' : 'info'
+                    }
+                    var playSelectedFile = function (event) {
+                        var file = this.files[0]
+                        var type = file.type
+                        var videoNode = document.querySelector('video')
+                        var canPlay = videoNode.canPlayType(type)
+                        if (canPlay === '') canPlay = 'no'
+                        var message = 'Can play type "' + type + '": ' + canPlay
+                        var isError = canPlay === 'no'
+                        displayMessage(message, isError)
+                        
+                        if (isError) {
+                            return
+                        }
+                        
+                        var fileURL = URL.createObjectURL(file)
+                        videoNode.src = fileURL
+                    }
+                    var inputNode = document.querySelector('input')
+                    inputNode.addEventListener('change', playSelectedFile, false)
+                })()
+                </script>
         </div>
         <div class="transcripcion">
             <!--JS editable chill-->
             <textarea id="transcripcion" name="transcripcion"> 
-
+                
             </textarea>
-
+            
+            <button class="ejecutar" onclick="abrir()">Iniciar análisis del vídeo</button>
+            <button class="boton-generico" onclick="cargarTexto()">Cargar texto</button>
             <button class="boton-generico">Guardar</button>
             <button class="boton-generico">Sugerir</button>
-
+            
         </div>
     </div>
 </body>
