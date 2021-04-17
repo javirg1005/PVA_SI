@@ -1,90 +1,101 @@
-<head>
-    <script src="eel.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script async src="//jsfiddle.net/dsbonev/cCCZ2/embed/"></script>
-    <script>
-        //Funciones de javascript que llaman a python
-        //eel.funcion()
-
-        function abrir() {
-            eel.abrir_archivo();
-        }
-
-        eel.expose(cargarTexto);
-        function cargarTexto() {
-            texto = eel.leerTextoBruto()
-            document.getElementById("transcripcion").innerText = texto
-        }
-
-        eel.expose(showAnswers);
-        function showAnswers(answer) {
-            var outputDiv = document.getElementById("path_magic");
-            outputDiv.innerHTML = answer;
-            $('#video_car source').attr('src', "file://" + answer);
-        }
-
-        /*
-        function main() {
-            console.log($('#video_path').val());
-            document.querySelector("#video_car > source").src = $('#video_path').val();
-        }
-        */
-    </script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="dataForm">
-        <h5>Introduzca la ruta del video:</h5>
-        <br>
-        <div id='path_magic'></div>
-    </div>
-    <div class="contenido">
-        <div class="video_div">
-            <div id="message"></div>
-            <input id='video_path' class="ruta" type="file" accept="video/*"> <!-- Input de ruta -->
-            <video id="video_car" width="852" height="480" controls></video>
-            <script type="text/javascript">
-                (function localFileVideoPlayer() {
-                    'use strict'
-                    var URL = window.URL || window.webkitURL
-                    var displayMessage = function (message, isError) {
-                        var element = document.querySelector('#message')
-                        element.innerHTML = message
-                        element.className = isError ? 'error' : 'info'
-                    }
-                    var playSelectedFile = function (event) {
-                        var file = this.files[0]
-                        var type = file.type
-                        var videoNode = document.querySelector('video')
-                        var canPlay = videoNode.canPlayType(type)
-                        if (canPlay === '') canPlay = 'no'
-                        var message = 'Can play type "' + type + '": ' + canPlay
-                        var isError = canPlay === 'no'
-                        displayMessage(message, isError)
-                        
-                        if (isError) {
-                            return
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Lato&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Lato&family=Lobster+Two:ital@1&display=swap" rel="stylesheet">
+        <script src="eel.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script async src="//jsfiddle.net/dsbonev/cCCZ2/embed/"></script>
+        <script>
+            //Funciones de javascript que llaman a python
+            //eel.funcion()
+    
+            function abrir() {
+                eel.abrir_archivo();
+            }
+    
+            function cargarTextoBruto() {
+                eel.leerTextoBruto()
+            }
+    
+            function cargarTextoRevisado() {
+                eel.leerTextoRevisado()
+            }
+    
+            function guardarTextoR(){
+                lugar = $("#transcripcion").val()
+                console.log(lugar)
+                eel.guardarTextoRevisado(lugar)
+            }
+    
+            function sugerirCodes() {
+                eel.etiquetar()
+            }
+            
+            eel.expose(escribirTexto);
+            function escribirTexto(txt) {
+                lugar = txt
+                document.getElementById("transcripcion").innerText = lugar
+            }
+    
+        </script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="dataForm">
+            <h1>PVA</h1>
+        </div>
+        <div class="contenido">
+            <div class="video_div">
+                <video id="video_car" width="852" height="480" controls></video>
+                <label for="video_path" class="ruta">
+                    <input id='video_path' type="file" accept="video/*"> <!-- Input de ruta -->
+                    Seleccionar archivo de vídeo
+                </label>
+                <div id="message"></div>
+                <script type="text/javascript">
+                    (function localFileVideoPlayer() {
+                        'use strict'
+                        var URL = window.URL || window.webkitURL
+                        var displayMessage = function (message, isError) {
+                            var element = document.querySelector('#message')
+                            element.innerHTML = message
+                            element.className = isError ? 'error' : 'info'
                         }
-                        
-                        var fileURL = URL.createObjectURL(file)
-                        videoNode.src = fileURL
-                    }
-                    var inputNode = document.querySelector('input')
-                    inputNode.addEventListener('change', playSelectedFile, false)
-                })()
-                </script>
-        </div>
-        <div class="transcripcion">
-            <!--JS editable chill-->
-            <textarea id="transcripcion" name="transcripcion"> 
+                        var playSelectedFile = function (event) {
+                            var file = this.files[0]
+                            var type = file.type
+                            var videoNode = document.querySelector('video')
+                            var canPlay = videoNode.canPlayType(type)
+                            if (canPlay === '') canPlay = 'no'
+                            var message = ''
+                            var isError = canPlay === 'no'
+                            displayMessage(message, isError)
+                            
+                            if (isError) {
+                                return
+                            }
+                            
+                            var fileURL = URL.createObjectURL(file)
+                            videoNode.src = fileURL
+                        }
+                        var inputNode = document.querySelector('input')
+                        inputNode.addEventListener('change', playSelectedFile, false)
+                    })()
+                    </script>
+            </div>
+            <div class="transcripcion">
+                <!--JS editable chill-->
+                <textarea id="transcripcion" name="transcripcion"></textarea>
+                <div class="button_div">
+                    <button class="ejecutar" onclick="abrir()">Iniciar análisis del vídeo</button>
+                    <button class="boton-generico" onclick="cargarTextoBruto()">Cargar texto en bruto</button>
+                    <button class="boton-generico" onclick="cargarTextoRevisado()">Cargar texto revisado</button>
+                    <button class="boton-generico" onclick="guardarTextoR()">Guardar texto revisado</button>
+                    <button class="boton-generico" onclick="sugerirCodes()">Sugerir</button>
+                </div>
                 
-            </textarea>
-            
-            <button class="ejecutar" onclick="abrir()">Iniciar análisis del vídeo</button>
-            <button class="boton-generico" onclick="cargarTexto()">Cargar texto</button>
-            <button class="boton-generico">Guardar</button>
-            <button class="boton-generico">Sugerir</button>
-            
+            </div>
         </div>
-    </div>
-</body>
+    </body>
+</html>

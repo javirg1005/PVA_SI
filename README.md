@@ -11,3 +11,4 @@ Por: Carlos Delgado Rodríguez y Javier Rodríguez González
 -MoviePy
 -SpeechRecognition
 -TKinter (tk)
+-nltk

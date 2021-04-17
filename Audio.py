@@ -7,6 +7,13 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from moviepy.video.io.VideoFileClip import VideoFileClip
 import tkinter
 from tkinter.filedialog import askopenfilename
+import string
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer
+from nltk.tokenize.treebank import TreebankWordDetokenizer
+from nltk.tokenize import word_tokenize
 
 
 #'''
@@ -14,31 +21,51 @@ from tkinter.filedialog import askopenfilename
 @eel.expose()
 def abrir_archivo():
     print("Hola! Voy a abrir un archivo")
-    #Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-    #tkinter._support_default_root = False
     filename = askopenfilename() # show an "Open" dialog box and return the path to the selected file
     tkinter._default_root.destroy()
     print(filename)
-    eel.showAnswers(filename)
     chufla(filename)
 
 @eel.expose()
 def leerTextoBruto():
-    f = open ('Transcripcion_Bruta' + '.txt','rb')
+    f = open ('Transcripcion_Bruta.txt','r',encoding='utf8')
+    texto = f.read()
     f.close()
-    return f
+    print(texto)
+    eel.escribirTexto(texto)
+
+@eel.expose()
+def leerTextoRevisado():
+    f = open ('Transcripcion_Revisada.txt','r',encoding='utf8')
+    texto = f.read()
+    f.close()
+    eel.escribirTexto(texto)
+
+def leerTextoRevisadoEtiquetar():
+    f = open ('Transcripcion_Revisada.txt','r',encoding='utf8')
+    texto = f.read()
+    f.close()
+    return texto
+
+@eel.expose()
+def leerTextoEtiquetado():
+    f = open ('Transcripcion_Etiquetada.txt','r',encoding='utf8')
+    texto = f.read()
+    f.close()
+    eel.escribirTexto(texto)
+
+@eel.expose()
+def guardarTextoRevisado(texto):
+    f = open ('Transcripcion_Revisada.txt','w',encoding='utf8')
+    f.write(texto)
+    f.close()
+    print(estemizar(limpiar(texto)))
 
 #Hace hasta la transcripcion bruta
 def chufla(path):
     texto = trocear_video(path)
     print("video troceado")
     escribir_transcripcion(texto, "Transcripcion_Bruta")
-    return texto
-    #Revision de usuario
-    
-    #se imprime en un txt
-    #escribir_transcripcion(texto, "Transcripcion_Revisada")
-    
 
 #Se corta el video en segmentos mas pequeños para poder tratarlos
 def trocear_video(path):
@@ -79,13 +106,77 @@ def escribir_transcripcion(lista, name):
     archivo_transcrito.writelines(lista)
     archivo_transcrito.close()
     print ("Se ha guardado la transcripción en el archivo " + nombre_archivo_transcrito + " en tu ruta actual")
-#Testing
-#chufla('PruebasSplit\Video_Coche.mp4')
-#Reconocimiento
-    
-#Edicion
 
-#Modificar e insertar
+@eel.expose()
+def etiquetar():
+    # Diccionario de instrucciones
+    # Violencia y extorsión de Patri
+    instrucciones = {
+        'arranc coch':'GO',
+        'sub march':'GU',
+        'aument march':'GU',
+        'intermitent derech':'RB',
+        'baj march':'GD',
+        'dismin march':'GD',
+        'intermitent izquierd':'LB',
+        'fren':'BRK',
+        'gir izquierd':'TL',
+        'gir derech':'TR',
+        'incorpor rotond':'RNDBT-IN',
+        'entra rotond':'RNDBT-IN',
+        'sal rotond':'RNDBT-OUT',
+        'incorpor carreter':'ROAD-IN'
+    }
+
+    texto = leerTextoRevisadoEtiquetar()
+    print(texto)
+    txt_list = estemizar(limpiar(texto))
+    print(txt_list)
+    aux_list = []
+    for inst, code in enumerate(txt_list):
+        aux_list.append(code)
+        if code in instrucciones:
+            aux_list.append("<" + instrucciones[code] + ">")
+        elif (len(txt_list) > inst + 1):
+            code = txt_list[inst - 1] + " " + code
+            if code in instrucciones:
+                aux_list.append("<" + instrucciones[code] + ">")
+
+    labeled_text = ' '.join(aux_list)
+    print(labeled_text)
+    escribir_transcripcion(labeled_text, "Transcripcion_Etiquetada")
+    leerTextoEtiquetado()
+
+def limpiar(text):
+    sw = set(stopwords.words("spanish"))
+    # Limpio con regex el texto
+    text = re.sub('[%s]' % re.escape(string.punctuation + "'" + '"' + "’" + '”' + '“' + "•‘"), ' ', str(text))
+    text = re.sub('\w*\d\w*', ' ', str(text))
+    # Pongo el texto en minúsculas
+    text = text.lower()
+    # Tokenizo por palabras
+    text = word_tokenize(str(text))
+    tokens = []
+    for t in text:
+        if not t in sw:
+            tokens.append(t)
+    return tokens
+
+def estemizar(token_list):
+    new_token = []
+    for token in token_list:
+        token = SnowballStemmer('spanish').stem(token)
+        new_token.append(token)
+    return new_token
+
+def destokenizar(token_list):
+    new_token = []
+    for token in token_list:
+        token = TreebankWordDetokenizer().detokenize(token)
+        new_token.append(token)
+    return new_token
+
+    # VETE A CAGAR FUERTE
 
 eel.init('web')
 eel.start('index.html', mode='chrome-app')
