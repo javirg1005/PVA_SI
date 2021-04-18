@@ -1,10 +1,9 @@
-import tkinter
 import moviepy.editor as mp
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 import speech_recognition as sr
 import os
 import eel
-from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-from moviepy.video.io.VideoFileClip import VideoFileClip
 import tkinter
 from tkinter.filedialog import askopenfilename
 import string
