@@ -12,9 +12,7 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
-from nltk.tokenize.treebank import TreebankWordDetokenizer
 from nltk.tokenize import word_tokenize
-
 
 #'''
 
@@ -168,15 +166,6 @@ def estemizar(token_list):
         token = SnowballStemmer('spanish').stem(token)
         new_token.append(token)
     return new_token
-
-def destokenizar(token_list):
-    new_token = []
-    for token in token_list:
-        token = TreebankWordDetokenizer().detokenize(token)
-        new_token.append(token)
-    return new_token
-
-    # VETE A CAGAR FUERTE
 
 eel.init('web')
 eel.start('index.html', mode='chrome-app')
